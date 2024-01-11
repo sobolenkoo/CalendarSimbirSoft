@@ -12,13 +12,15 @@ import com.example.calendarsimbirsoft.R
 import com.example.calendarsimbirsoft.databinding.EventsFragmentBinding
 import com.example.calendarsimbirsoft.presentation.recycler.MainAdapter
 import com.example.calendarsimbirsoft.presentation.viewModel.EventsViewModel
+import com.example.calendarsimbirsoft.presentation.viewModel.Navigation
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import java.util.Calendar
 
 class EventsFragment : Fragment(R.layout.events_fragment) {
     private val binding: EventsFragmentBinding by viewBinding()
-    private val adapterDelegate = MainAdapter { eventsUI -> moveToDetailsFragment(eventsUI) }
-    private val viewModel: EventsViewModel by viewModel()
+    private val adapterDelegate = MainAdapter { eventsUI -> viewModel.onEventClick(eventsUI) }
+    private val viewModel: EventsViewModel by sharedViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -34,12 +36,38 @@ class EventsFragment : Fragment(R.layout.events_fragment) {
                 }
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.currentDate.collect { date ->
+                    binding.calendarView.date = date
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigationItem.collect { item ->
+                    when(item) {
+                        is Navigation.EventsDetails -> moveToDetailsFragment(item)
+                        is Navigation.Pop -> findNavController().popBackStack()
+                    }
+                }
+            }
+        }
+
+        binding.calendarView.setOnDateChangeListener { _, year: Int, month: Int, dayOfMonth: Int ->
+            val calendar: Calendar = Calendar.getInstance()
+            calendar.set(year, month, dayOfMonth)
+            viewModel.setCurrentDate(calendar.timeInMillis)
+        }
     }
 
-    private fun moveToDetailsFragment(eventsUI: EventsUI) {
+    private fun moveToDetailsFragment(navigation: Navigation.EventsDetails) {
         findNavController().navigate(
             EventsFragmentDirections.actionEventsFragmentToEventsDetailsFragment(
-                eventsUI
+                navigation.eventsUI,
+                navigation.date
             )
         )
     }

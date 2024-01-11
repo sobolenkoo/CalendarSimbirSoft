@@ -23,6 +23,10 @@
             android:name="eventsUI"
             app:argType="com.example.calendarsimbirsoft.presentation.EventsUI"
             app:nullable="false" />
+        <argument
+            android:name="date"
+            app:argType="java.lang.Long"
+            app:nullable="false" />
         <action
             android:id="@+id/action_eventsDetailsFragment_to_eventsFragment"
             app:destination="@id/eventsFragment" />
