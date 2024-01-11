@@ -17,7 +17,12 @@
     <fragment
         android:id="@+id/eventsDetailsFragment"
         android:name="com.example.calendarsimbirsoft.presentation.EventsDetailsFragment"
-        android:label="EventsDetailsFragment" >
+        android:label="EventsDetailsFragment"
+        tools:layout="@layout/events_details_fragment">
+        <argument
+            android:name="eventsUI"
+            app:argType="com.example.calendarsimbirsoft.presentation.EventsUI"
+            app:nullable="false" />
         <action
             android:id="@+id/action_eventsDetailsFragment_to_eventsFragment"
             app:destination="@id/eventsFragment" />
