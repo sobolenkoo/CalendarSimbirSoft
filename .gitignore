@@ -18,6 +18,8 @@ output.json
 *.iml
 .idea/
 misc.xml
+gradle.xml
+kotlinc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
 
