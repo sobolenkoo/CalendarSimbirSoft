@@ -49,20 +49,20 @@ android {
 
 dependencies {
 
+    //DateTime
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+
     //ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-
 
     //Json
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
-
     //AdapterDelegates
     implementation("com.hannesdorfmann:adapterdelegates4-kotlin-dsl-viewbinding:4.3.2")
-
-
+    
     //Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
     implementation("io.insert-koin:koin-android:3.4.1")

@@ -4,10 +4,6 @@ import android.os.Parcelable
 import com.example.calendarsimbirsoft.presentation.recycler.ListItem
 import kotlinx.android.parcel.Parcelize
 
-data class EventsUiDTO(
-    var events: List<EventsUI>
-)
-
 @Parcelize
 data class EventsUI(
     val id: String,
