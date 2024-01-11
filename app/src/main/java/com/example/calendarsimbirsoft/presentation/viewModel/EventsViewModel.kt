@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calendarsimbirsoft.data.EventsRepository
 import com.example.calendarsimbirsoft.domain.NetworkResults
+import com.example.calendarsimbirsoft.presentation.EventsMapper
 import com.example.calendarsimbirsoft.presentation.EventsUI
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class EventsViewModel(
-    private val repository: EventsRepository
+    private val repository: EventsRepository,
+    private val mapper: EventsMapper
 ) : ViewModel() {
     private var allEvents: List<EventsUI> = emptyList()
 
@@ -27,7 +29,7 @@ class EventsViewModel(
         viewModelScope.launch {
             when (val networkResults = repository.getEventsData()) {
                 is NetworkResults.Success -> {
-                    allEvents = networkResults.result
+                    allEvents = networkResults.result.map { mapper.mapEventsToEventsUI(it) }
                     _currentEvents.value = allEvents
                 }
 

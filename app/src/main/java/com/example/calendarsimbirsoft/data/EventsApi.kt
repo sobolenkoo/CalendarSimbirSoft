@@ -1,16 +1,14 @@
 package com.example.calendarsimbirsoft.data
 
 import android.content.Context
-import com.example.calendarsimbirsoft.presentation.EventsUI
-import com.example.calendarsimbirsoft.presentation.EventsUiDTO
 import com.google.gson.Gson
 import retrofit2.Response
 
 class EventsApi(private val context: Context) {
 
-    fun getEventsResultsFromJson(): Response<List<EventsUI>> {
+    fun getEventsResultsFromJson(): Response<List<EventDTO>> {
         val readData = readJsonFromAssets("demo/events.json")
-        val data = Gson().fromJson(readData, EventsUiDTO::class.java).events
+        val data = Gson().fromJson(readData, EventsDTO::class.java).events
         return Response.success(data)
     }
 
