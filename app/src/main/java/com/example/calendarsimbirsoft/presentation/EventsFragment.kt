@@ -19,7 +19,7 @@ import java.util.Calendar
 
 class EventsFragment : Fragment(R.layout.events_fragment) {
     private val binding: EventsFragmentBinding by viewBinding()
-    private val adapterDelegate = MainAdapter { eventsUI -> viewModel.onEventClick(eventsUI) }
+    private val adapterDelegate = MainAdapter{ event -> viewModel.onEventClick(event) }
     private val viewModel: EventsViewModel by sharedViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -27,15 +27,17 @@ class EventsFragment : Fragment(R.layout.events_fragment) {
         bindViews()
     }
 
+
     private fun bindViews() {
         binding.recyclerView.adapter = adapterDelegate
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.currentEvents.collect { events ->
+                viewModel.currentCells.collect { events ->
                     adapterDelegate.items = events
                 }
             }
         }
+
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -44,31 +46,39 @@ class EventsFragment : Fragment(R.layout.events_fragment) {
                 }
             }
         }
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.navigationItem.collect { item ->
-                    when(item) {
+                    when (item) {
                         is Navigation.EventsDetails -> moveToDetailsFragment(item)
+                        is Navigation.EmptyEvents -> Unit
                         is Navigation.Pop -> findNavController().popBackStack()
                     }
                 }
             }
         }
-
         binding.calendarView.setOnDateChangeListener { _, year: Int, month: Int, dayOfMonth: Int ->
             val calendar: Calendar = Calendar.getInstance()
             calendar.set(year, month, dayOfMonth)
             viewModel.setCurrentDate(calendar.timeInMillis)
+
+        }
+        binding.btnCreateEvent.setOnClickListener {
+                moveToCreateEventsFragment()
         }
     }
 
     private fun moveToDetailsFragment(navigation: Navigation.EventsDetails) {
         findNavController().navigate(
             EventsFragmentDirections.actionEventsFragmentToEventsDetailsFragment(
-                navigation.eventsUI,
-                navigation.date
+                navigation.eventsUI
             )
         )
     }
+
+    private fun moveToCreateEventsFragment() {
+        findNavController().navigate(
+            EventsFragmentDirections.actionEventsFragmentToCreateEventsFragment())
+    }
+
 }

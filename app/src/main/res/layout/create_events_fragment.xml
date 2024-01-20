@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -19,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Запланировать событие"
+            android:text="Создать событие"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -29,7 +30,7 @@
             android:layout_height="40dp"
             android:layout_gravity="top|start"
             android:backgroundTint="@color/white"
-            android:drawableBottom="@drawable/backstack" />
+            android:drawableBottom="@drawable/backstack"/>
 
 
         <Button
@@ -38,21 +39,18 @@
             android:layout_height="40dp"
             android:layout_gravity="top|end"
             android:backgroundTint="@color/white"
-            android:drawableBottom="@drawable/mark" />
+            android:drawableBottom="@drawable/mark"/>
     </FrameLayout>
 
     <EditText
-        android:id="@+id/title"
+        android:id="@+id/createTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/separator"
-        android:gravity="center"
-        android:text="Дело 1"
+        android:hint="Название События"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar" />
-
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/linearDate"
@@ -60,10 +58,10 @@
         android:layout_height="wrap_content"
         android:background="@drawable/separator"
         android:orientation="horizontal"
-        android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="10dp"
+        app:layout_constraintTop_toBottomOf="@id/createTitle">
 
         <TextView
             android:id="@+id/titleDateStart"
@@ -79,7 +77,7 @@
 
 
         <EditText
-            android:id="@+id/startDate"
+            android:id="@+id/createDateStart"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.6"
@@ -89,7 +87,9 @@
             android:textSize="16sp" />
 
 
+
     </androidx.appcompat.widget.LinearLayoutCompat>
+
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/linearTitleTime"
@@ -113,7 +113,7 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/linearDate" />
+            app:layout_constraintTop_toBottomOf="@id/createTitle" />
 
         <TextView
             android:id="@+id/titleEndTime"
@@ -138,15 +138,16 @@
         android:background="@drawable/separator"
         android:orientation="horizontal"
         android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/linearTitleTime">
 
+
         <EditText
-            android:id="@+id/timeStart"
+            android:id="@+id/createTimeStart"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
+            android:layout_weight="0.4"
             android:backgroundTint="@color/white"
             android:focusable="false"
             android:gravity="center"
@@ -155,38 +156,26 @@
 
 
         <EditText
-            android:id="@+id/timeFinish"
+            android:id="@+id/createTimeFinish"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
+            android:layout_weight="0.4"
+            android:gravity="center"
             android:backgroundTint="@color/white"
             android:focusable="false"
-            android:gravity="center"
             android:textColor="@color/black"
             android:textSize="16sp" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-
     <EditText
-        android:id="@+id/description"
+        android:id="@+id/createDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/separator"
-        android:gravity="center"
-        android:text="Описание"
+        android:hint="Описание События"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/linearTime" />
-
-    <Button
-        android:id="@+id/btnDelete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
