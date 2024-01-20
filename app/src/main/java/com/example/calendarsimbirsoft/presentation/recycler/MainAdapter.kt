@@ -7,6 +7,7 @@ class MainAdapter(itemClickedListener: (EventsUI) -> Unit) :
     AsyncListDifferDelegationAdapter<ListItem>(EventsDiffUtils()) {
     init {
         delegatesManager
+            .addDelegate(MainDelegates.emptyEventsItemsDelegates())
             .addDelegate(MainDelegates.eventsItemsDelegates(itemClickedListener))
     }
 }

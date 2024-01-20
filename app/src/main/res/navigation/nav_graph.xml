@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_eventsFragment_to_eventsDetailsFragment"
             app:destination="@id/eventsDetailsFragment" />
+        <action
+            android:id="@+id/action_eventsFragment_to_createEventsFragment"
+            app:destination="@id/createEventsFragment" />
     </fragment>
     <fragment
         android:id="@+id/eventsDetailsFragment"
@@ -23,12 +26,15 @@
             android:name="eventsUI"
             app:argType="com.example.calendarsimbirsoft.presentation.EventsUI"
             app:nullable="false" />
-        <argument
-            android:name="date"
-            app:argType="java.lang.Long"
-            app:nullable="false" />
-        <action
-            android:id="@+id/action_eventsDetailsFragment_to_eventsFragment"
-            app:destination="@id/eventsFragment" />
+<!--        <argument-->
+<!--            android:name="date"-->
+<!--            app:argType="java.lang.Long"-->
+<!--            app:nullable="false" />-->
+    </fragment>
+    <fragment
+        android:id="@+id/createEventsFragment"
+        android:name="com.example.calendarsimbirsoft.presentation.CreateEventsFragment"
+        android:label="CreateEventsFragment" >
+
     </fragment>
 </navigation>
