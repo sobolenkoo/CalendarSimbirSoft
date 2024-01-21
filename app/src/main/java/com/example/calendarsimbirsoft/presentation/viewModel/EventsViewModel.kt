@@ -2,9 +2,10 @@ package com.example.calendarsimbirsoft.presentation.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.calendarsimbirsoft.data.EventsLocalRepository
+import com.example.calendarsimbirsoft.data.EventsRepository
 import com.example.calendarsimbirsoft.presentation.EmptyCellItem
 import com.example.calendarsimbirsoft.presentation.EventsUI
+import com.example.calendarsimbirsoft.presentation.Navigation
 import com.example.calendarsimbirsoft.presentation.recycler.ListItem
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,21 +20,16 @@ import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import javax.inject.Inject
 
-
-sealed interface Navigation {
-    data class EventsDetails(val eventsUI: EventsUI) : Navigation
-    data class EmptyEvents(val emptyItem: EmptyCellItem) : Navigation
-    data object Pop : Navigation
-}
-
-class EventsViewModel(
-    private val eventsLocalRepository: EventsLocalRepository
+class EventsViewModel @Inject constructor(
+    private val eventsLocalRepository: EventsRepository
 ) : ViewModel() {
 
     private val _currentCells = MutableStateFlow<List<ListItem>>(emptyList())
     val currentCells: StateFlow<List<ListItem>> = _currentCells.asStateFlow()
 
+    private val _currentEvent: MutableStateFlow<EventsUI?> = MutableStateFlow(null)
 
     private val _currentDate = MutableStateFlow<Long>(System.currentTimeMillis())
     val currentDate: StateFlow<Long> = _currentDate.asStateFlow()
@@ -41,23 +37,21 @@ class EventsViewModel(
     private val _navigationItem = MutableSharedFlow<Navigation>()
     val navigationItem: SharedFlow<Navigation> = _navigationItem.asSharedFlow()
 
-    private val _currentEvent: MutableStateFlow<EventsUI?> = MutableStateFlow(null)
-
+    private val dateTimeFormatter: DateTimeFormatter =
+        DateTimeFormatter.ofPattern("dd MMMM yyyy г.", Locale("ru"))
 
     init {
-        val dateTimeFormatter: DateTimeFormatter =
-            DateTimeFormatter.ofPattern("dd MMMM yyyy г.", Locale("ru"))
         val date = Instant.fromEpochMilliseconds(System.currentTimeMillis()).toLocalDateTime(
             TimeZone.UTC
         ).toJavaLocalDateTime().format(dateTimeFormatter)
-        filteringEventsFromDataBase(date)
+        filteringCellsFromDataBaseByDate(date)
     }
 
-    fun filteringEventsFromDataBase(date: String) {
+    private fun filteringCellsFromDataBaseByDate(date: String) {
         _currentCells.value = createEmptyCells()
         viewModelScope.launch {
             eventsLocalRepository.readEventsByDate(date).filter { entity ->
-                entity.startDate == date
+                entity.date == date
             }.forEach {
                 setEvent(it)
             }
@@ -66,41 +60,36 @@ class EventsViewModel(
 
     fun setEvent(eventsUI: EventsUI) {
         viewModelScope.launch {
-            val dateTimeFormatter: DateTimeFormatter =
-                DateTimeFormatter.ofPattern("dd MMMM yyyy г.", Locale("ru"))
             val setDate = Instant.fromEpochMilliseconds(_currentDate.value).toLocalDateTime(
                 TimeZone.UTC
             ).toJavaLocalDateTime().format(dateTimeFormatter)
             eventsUI.let {
                 val currentEvents = _currentCells.value
                 val changedEvents = currentEvents.map { event ->
-                    if (eventsUI.startTime >= event.startTime && eventsUI.endTime <= event.endTime && eventsUI.startDate == setDate) {
+                    if ((eventsUI.startTime >= event.startTime && eventsUI.startTime < event.endTime) ||
+                        (eventsUI.endTime > event.startTime && eventsUI.endTime <= event.endTime) ||
+                        (eventsUI.startTime < event.startTime && eventsUI.endTime > event.endTime && eventsUI.date == setDate && eventsUI.id == event.itemId)
+                    ) {
                         eventsUI
                     } else {
                         event
                     }
                 }
-
                 _currentCells.value = changedEvents
-
             }
             eventsLocalRepository.updateEvent(eventsUI)
         }
     }
 
+
     fun setCurrentDate(date: Long) {
         _currentDate.value = date
         _currentCells.value = createEmptyCells()
         viewModelScope.launch {
-            val dateTimeFormatter: DateTimeFormatter =
-                DateTimeFormatter.ofPattern("dd MMMM yyyy г.", Locale("ru"))
             val setDate = Instant.fromEpochMilliseconds(date).toLocalDateTime(
                 TimeZone.UTC
             ).toJavaLocalDateTime().format(dateTimeFormatter)
-            val eventsDB = eventsLocalRepository.readEventsByDate(setDate)
-            eventsDB.forEach {
-                setEvent(it)
-            }
+            filteringCellsFromDataBaseByDate(setDate)
         }
     }
 
@@ -111,21 +100,30 @@ class EventsViewModel(
         }
     }
 
+    fun onCreateEventClick() {
+        viewModelScope.launch {
+            _navigationItem.emit(Navigation.CreateEvent)
+        }
+    }
+
+    fun onBackStackClick() {
+        viewModelScope.launch {
+            _navigationItem.emit(Navigation.Pop)
+        }
+    }
+
     fun onBtnDeleteClick() {
         viewModelScope.launch {
             val currentEvent = _currentEvent.value
             currentEvent?.let {
-                eventsLocalRepository.deleteEvents(currentEvent)
+                eventsLocalRepository.deleteEvent(currentEvent)
                 _navigationItem.emit(Navigation.Pop)
-                filteringEventsFromDataBase(currentEvent.startDate)
+                filteringCellsFromDataBaseByDate(currentEvent.date)
             }
-
         }
     }
 
-    fun onBtnConfirmClicked() {
-        val dateTimeFormatter: DateTimeFormatter =
-            DateTimeFormatter.ofPattern("dd MMMM yyyy г.", Locale("ru"))
+    fun onDetailsBtnConfirmClicked() {
         val setDate = Instant.fromEpochMilliseconds(_currentDate.value).toLocalDateTime(
             TimeZone.UTC
         ).toJavaLocalDateTime().format(dateTimeFormatter)
@@ -146,32 +144,31 @@ class EventsViewModel(
                 _currentEvent.value = null
                 _currentCells.value = changedCells
             }
-            filteringEventsFromDataBase(setDate)
+            filteringCellsFromDataBaseByDate(setDate)
             _navigationItem.emit(Navigation.Pop)
         }
     }
 
-    fun updateTitleText(text: String) {
-        _currentEvent.value = _currentEvent.value?.copy(name = text)
+    fun updateTitle(title: String) {
+        _currentEvent.value = _currentEvent.value?.copy(name = title)
     }
 
-    fun updateDescriptionText(text: String) {
-        _currentEvent.value = _currentEvent.value?.copy(description = text)
+    fun updateDescription(description: String) {
+        _currentEvent.value = _currentEvent.value?.copy(description = description)
     }
 
-    fun updateDateStartText(dateStart: String) {
-        _currentEvent.value = _currentEvent.value?.copy(startDate = dateStart)
+    fun updateDate(date: String) {
+        _currentEvent.value = _currentEvent.value?.copy(date = date)
     }
 
 
-    fun updateTimeStartText(timeStart: String) {
-        _currentEvent.value = _currentEvent.value?.copy(startTime = timeStart)
+    fun updateStartTime(startTime: String) {
+        _currentEvent.value = _currentEvent.value?.copy(startTime = startTime)
     }
 
-    fun updateTimeFinishText(timeFinish: String) {
-        _currentEvent.value = _currentEvent.value?.copy(endTime = timeFinish)
+    fun updateEndTime(endTime: String) {
+        _currentEvent.value = _currentEvent.value?.copy(endTime = endTime)
     }
-
 
     private fun createEmptyCells() = listOf(
         EmptyCellItem("1", "00:00", "01:00"),

@@ -1,15 +1,15 @@
 buildscript {
     dependencies {
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.6")
+        classpath(Libraries.Navigation.navigationSafeArgs)
     }
 }
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("androidx.navigation.safeargs")
-    id ("kotlin-parcelize")
-    id("com.google.devtools.ksp")
+    id(Plugins.application)
+    id(Plugins.jetBrains)
+    id(Plugins.navigationSafeArgs)
+    id(Plugins.parcelize)
+    id(Plugins.ksp)
 }
 
 android {
@@ -49,41 +49,23 @@ android {
 }
 
 dependencies {
-    //Room
-    val roomVersion = "2.6.1"
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    annotationProcessor("androidx.room:room-compiler:$roomVersion")
-    ksp("androidx.room:room-compiler:$roomVersion")
-
-
-    //DateTime
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
-
-    //ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-
-    //Json
-    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
-    implementation("com.google.code.gson:gson:2.10.1")
-
-    //AdapterDelegates
-    implementation("com.hannesdorfmann:adapterdelegates4-kotlin-dsl-viewbinding:4.3.2")
-    
-    //Navigation
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
-    implementation("io.insert-koin:koin-android:3.4.1")
-
-    //ViewBinding
-    implementation("com.github.kirich1409:viewbindingpropertydelegate-full:1.5.9")
-
-    implementation("androidx.fragment:fragment-ktx:1.6.2")
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation(Libraries.Dagger.dagger)
+    ksp (Libraries.Dagger.daggerCompiler)
+    implementation(Libraries.Room.roomRuntime)
+    implementation(Libraries.Room.roomKtx)
+    annotationProcessor(Libraries.Room.roomCompiler)
+    ksp(Libraries.Room.roomCompiler)
+    implementation(Libraries.DateTime.dateTime)
+    implementation(Libraries.Adapter.adapterDelegate)
+    implementation(Libraries.Navigation.navigationFragment)
+    implementation(Libraries.AndroidX.viewModel)
+    implementation(Libraries.AndroidX.viewBinding)
+    implementation(Libraries.AndroidX.fragment)
+    implementation(Libraries.AndroidX.core)
+    implementation(Libraries.AndroidX.appCompat)
+    implementation(Libraries.AndroidX.material)
+    implementation(Libraries.AndroidX.constraintLayout)
+    testImplementation(Libraries.AndroidX.jUnit)
+    androidTestImplementation(Libraries.AndroidX.extjUnit)
+    androidTestImplementation(Libraries.AndroidX.espresso)
 }

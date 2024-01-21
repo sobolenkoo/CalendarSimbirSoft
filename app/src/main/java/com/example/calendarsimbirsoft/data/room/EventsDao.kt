@@ -8,14 +8,12 @@ import androidx.room.Query
 
 @Dao
 interface EventsDao {
-
     @Query("SELECT * FROM event")
     suspend fun readAllEvents(): List<EventEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addEvents(event: EventEntity)
+    suspend fun updateEvent(event: EventEntity)
 
     @Delete
     suspend fun deleteEvent(event: EventEntity)
-
 }
