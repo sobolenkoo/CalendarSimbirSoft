@@ -3,19 +3,19 @@ package com.example.calendarsimbirsoft.data
 import com.example.calendarsimbirsoft.data.room.EventEntity
 import com.example.calendarsimbirsoft.data.room.EventsDao
 import com.example.calendarsimbirsoft.presentation.EventsUI
+import javax.inject.Inject
 
-class EventsLocalRepositoryImpl(
+class EventsLocalRepository @Inject constructor(
     private val eventsDao: EventsDao
-) : EventsLocalRepository {
-
+) : EventsRepository {
 
     override suspend fun readEventsByDate(date: String): List<EventsUI> {
         return eventsDao.readAllEvents().filter { entity ->
-            entity.startDate == date
+            entity.date == date
         }.map { entity ->
             EventsUI(
                 id = entity.id,
-                startDate = entity.startDate,
+                date = entity.date,
                 name = entity.name,
                 description = entity.description,
                 startTime = entity.startTime,
@@ -27,21 +27,21 @@ class EventsLocalRepositoryImpl(
     override suspend fun updateEvent(event: EventsUI) {
         val entities = EventEntity(
             id = event.id,
-            startDate = event.startDate,
+            date = event.date,
             name = event.name,
             description = event.description,
             startTime = event.startTime,
             endTime = event.endTime
         )
 
-        eventsDao.addEvents(event = entities)
+        eventsDao.updateEvent(event = entities)
     }
 
-    override suspend fun deleteEvents(event: EventsUI) {
+    override suspend fun deleteEvent(event: EventsUI) {
 
         val entities = EventEntity(
             id = event.id,
-            startDate = event.startDate,
+            date = event.date,
             name = event.name,
             description = event.description,
             startTime = event.startTime,
@@ -52,10 +52,3 @@ class EventsLocalRepositoryImpl(
     }
 }
 
-interface EventsLocalRepository {
-    suspend fun readEventsByDate(date: String): List<EventsUI>
-
-    suspend fun updateEvent(event: EventsUI)
-    suspend fun deleteEvents(event: EventsUI)
-
-}

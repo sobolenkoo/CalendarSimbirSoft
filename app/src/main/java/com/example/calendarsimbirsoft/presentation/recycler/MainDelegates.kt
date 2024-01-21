@@ -7,19 +7,18 @@ import com.example.calendarsimbirsoft.presentation.EventsUI
 import com.hannesdorfmann.adapterdelegates4.dsl.adapterDelegateViewBinding
 
 object MainDelegates {
-
-
     fun emptyEventsItemsDelegates() =
         adapterDelegateViewBinding<EmptyCellItem, ListItem, EmptyItemBinding>(
             { inflater, container -> EmptyItemBinding.inflate(inflater, container, false) }
         ) {
             with(binding) {
-                root.setOnClickListener { }
+
                 bind {
 
                 }
             }
         }
+
     fun eventsItemsDelegates(itemClickedListener: (EventsUI) -> Unit) =
         adapterDelegateViewBinding<EventsUI, ListItem, EventsItemsBinding>(
             { inflater, container -> EventsItemsBinding.inflate(inflater, container, false) }

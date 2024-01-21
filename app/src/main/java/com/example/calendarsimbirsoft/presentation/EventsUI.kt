@@ -11,7 +11,7 @@ data class EventsUI(
     override var endTime: String,
     var name: String,
     var description: String,
-    var startDate: String,
+    var date: String,
 ) : ListItem, Parcelable {
     override val itemId: String = id
 }

@@ -2,36 +2,37 @@ package com.example.calendarsimbirsoft.presentation
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
-import android.widget.TimePicker
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.calendarsimbirsoft.R
+import com.example.calendarsimbirsoft.dagger.DI
 import com.example.calendarsimbirsoft.databinding.CreateEventsFragmentBinding
 import com.example.calendarsimbirsoft.presentation.viewModel.EventsViewModel
-import com.example.calendarsimbirsoft.presentation.viewModel.Navigation
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import javax.inject.Inject
 
-class CreateEventsFragment : Fragment(R.layout.create_events_fragment) {
+class CreateEventsFragment : BaseFragment() {
+    override val layoutRes: Int = R.layout.create_events_fragment
     private val binding: CreateEventsFragmentBinding by viewBinding()
-    private val viewModel: EventsViewModel by sharedViewModel()
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val viewModel by activityViewModels<EventsViewModel> { viewModelFactory }
     private val calendar: Calendar = Calendar.getInstance()
+
+    override fun setUpInjection() = DI.component.inject(this)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindDate()
@@ -40,38 +41,33 @@ class CreateEventsFragment : Fragment(R.layout.create_events_fragment) {
     }
 
     private fun bindDate() {
-        binding.createDateStart.setText(
-            SimpleDateFormat("dd MMMM yyyy г.", Locale("ru")).format(
-                System.currentTimeMillis()
-            )
-        )
-
+        binding.createDate.setText(
+            SimpleDateFormat("dd MMMM yyyy г.", Locale("ru")).format(System.currentTimeMillis()))
 
         val dateFormatter = SimpleDateFormat("dd MMMM yyyy г.", Locale("ru"))
 
-        val dateStartSetListener =
+        val dateSetListener =
             DatePickerDialog.OnDateSetListener { datePicker, year, monthOfYear, dayOfMonth ->
                 calendar.set(Calendar.YEAR, year)
                 calendar.set(Calendar.MONTH, monthOfYear)
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                binding.createDateStart.setText(dateFormatter.format(calendar.time))
+                binding.createDate.setText(dateFormatter.format(calendar.time))
             }
 
-        binding.createDateStart.setOnClickListener {
+        binding.createDate.setOnClickListener {
             context?.let {
                 DatePickerDialog(
-                    it, dateStartSetListener,
+                    it, dateSetListener,
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH),
                     calendar.get(Calendar.DAY_OF_MONTH)
                 ).show()
             }
         }
-
     }
 
-    fun bindTime() {
-        binding.createTimeStart.setText(
+    private fun bindTime() {
+        binding.createStartTime.setText(
             SimpleDateFormat(
                 "HH:00",
                 Locale("ru")
@@ -81,13 +77,13 @@ class CreateEventsFragment : Fragment(R.layout.create_events_fragment) {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.HOUR_OF_DAY, 1)
         val formattedTimeFinish = SimpleDateFormat("HH:00", Locale("ru")).format(calendar.time)
-        binding.createTimeFinish.setText(formattedTimeFinish)
+        binding.createEndTime.setText(formattedTimeFinish)
 
         val maxTimeFinishCalendar = Calendar.getInstance()
 
         val updateTimeFields: (Calendar, Calendar) -> Unit = { startCalendar, endCalendar ->
-            binding.createTimeStart.setText(startCalendar.formatTime("HH:mm"))
-            binding.createTimeFinish.setText(endCalendar.formatTime("HH:mm"))
+            binding.createStartTime.setText(startCalendar.formatTime("HH:mm"))
+            binding.createEndTime.setText(endCalendar.formatTime("HH:mm"))
         }
 
         val timeStartSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
@@ -101,7 +97,7 @@ class CreateEventsFragment : Fragment(R.layout.create_events_fragment) {
             updateTimeFields(calendar, maxTimeFinishCalendar)
         }
 
-        binding.createTimeStart.setOnClickListener {
+        binding.createStartTime.setOnClickListener {
             TimePickerDialog(
                 context,
                 AlertDialog.THEME_HOLO_LIGHT,
@@ -119,13 +115,15 @@ class CreateEventsFragment : Fragment(R.layout.create_events_fragment) {
             }
 
             if (newTimeFinish !in calendar..maxTimeFinishCalendar) {
-                binding.createTimeFinish.setText(maxTimeFinishCalendar.formatTime("HH:mm"))
-                showToast("Выбранное время должно быть в промежутке одного часа")
-            }
+                binding.createEndTime.setText(maxTimeFinishCalendar.formatTime("HH:mm"))
+                showToast(getString(R.string.errorTimeInvalid))
+            } else {
 
+                binding.createEndTime.setText(newTimeFinish.formatTime("HH:mm"))
+            }
         }
 
-        binding.createTimeFinish.setOnClickListener {
+        binding.createEndTime.setOnClickListener {
             TimePickerDialog(
                 context,
                 AlertDialog.THEME_HOLO_LIGHT,
@@ -137,19 +135,13 @@ class CreateEventsFragment : Fragment(R.layout.create_events_fragment) {
         }
     }
 
-    private fun Calendar.formatTime(pattern: String): String =
-        SimpleDateFormat(pattern, Locale("ru")).format(time)
-
-    private fun showToast(message: String) = Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-
     private fun bindViews() {
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.navigationItem.collect { item ->
                     when (item) {
                         is Navigation.EventsDetails -> Unit
-                        is Navigation.EmptyEvents -> Unit
+                        is Navigation.CreateEvent -> Unit
                         is Navigation.Pop -> findNavController().popBackStack()
                     }
                 }
@@ -159,29 +151,28 @@ class CreateEventsFragment : Fragment(R.layout.create_events_fragment) {
         with(binding) {
             val eventsUI = EventsUI(
                 id = "",
-                startTime = createTimeStart.text.toString(),
-                endTime = createTimeFinish.text.toString(),
+                startTime = createStartTime.text.toString(),
+                endTime = createEndTime.text.toString(),
                 name = createTitle.text.toString(),
                 description = createDescription.text.toString(),
-                startDate = createDateStart.text.toString()
+                date = createDate.text.toString()
 
             )
-
 
             createTitle.doOnTextChanged { titleText, _, _, _ ->
                 eventsUI.name = titleText.toString()
             }
 
-            createDateStart.doOnTextChanged { dateStart, _, _, _ ->
-                eventsUI.startDate = dateStart.toString()
+            createDate.doOnTextChanged { date, _, _, _ ->
+                eventsUI.date = date.toString()
             }
 
 
-            createTimeStart.doOnTextChanged { timeStart, _, _, _ ->
+            createStartTime.doOnTextChanged { timeStart, _, _, _ ->
                 eventsUI.startTime = timeStart.toString()
             }
 
-            createTimeFinish.doOnTextChanged { timeFinish, _, _, _ ->
+            createEndTime.doOnTextChanged { timeFinish, _, _, _ ->
                 eventsUI.endTime = timeFinish.toString()
             }
 
@@ -195,25 +186,28 @@ class CreateEventsFragment : Fragment(R.layout.create_events_fragment) {
                     viewModel.setEvent(eventsUI)
                     findNavController().popBackStack()
                 } else {
-                    showToast("Заполните информацию о событии")
+                    showToast(getString(R.string.errorFillEventInformation))
                 }
             }
 
             binding.btnBackStack.setOnClickListener {
-                findNavController().popBackStack()
+                viewModel.onBackStackClick()
             }
         }
     }
+
+    private fun Calendar.formatTime(pattern: String): String =
+        SimpleDateFormat(pattern, Locale("ru")).format(time)
+
+    private fun showToast(message: String) =
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 
     private fun isEventsUIValid(eventsUI: EventsUI): Boolean {
         return eventsUI.startTime.isNotBlank() &&
                 eventsUI.endTime.isNotBlank() &&
                 eventsUI.name.isNotBlank() &&
                 eventsUI.description.isNotBlank() &&
-                eventsUI.startDate.isNotBlank()
+                eventsUI.date.isNotBlank()
 
     }
 }
-
-
-
