@@ -14,3 +14,11 @@
 По хорошему необходимо делать кастомные вью, чтобы не ограничивать функционал приложения. Сделал так как успел, исходя из времени.
 
 ## Sreenshots
+![Скриншот 1](app/src/main/res/screenshots/screenshot_1.png)
+![Скриншот 2](app/src/main/res/screenshots/screenshot_2.png)
+![Скриншот 3](app/src/main/res/screenshots/screenshot_3.png)
+![Скриншот 4](app/src/main/res/screenshots/screenshot_4.png)
+![Скриншот 5](app/src/main/res/screenshots/screenshot_5.png)
+![Скриншот 6](app/src/main/res/screenshots/screenshot_6.png)
+![Скриншот 7](app/src/main/res/screenshots/screenshot_7.png)
+![Скриншот 8](app/src/main/res/screenshots/screenshot_8.png)
