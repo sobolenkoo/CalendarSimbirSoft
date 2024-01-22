@@ -75,7 +75,6 @@ class CreateEventsFragment : BaseFragment() {
         )
 
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.HOUR_OF_DAY, 1)
         val formattedTimeFinish = SimpleDateFormat("HH:00", Locale("ru")).format(calendar.time)
         binding.createEndTime.setText(formattedTimeFinish)
 
