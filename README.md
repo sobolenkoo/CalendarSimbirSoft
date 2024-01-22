@@ -14,11 +14,11 @@
 По хорошему необходимо делать кастомные вью, чтобы не ограничивать функционал приложения. Сделал так как успел, исходя из времени.
 
 ## Sreenshots
-<img src="app/src/main/res/screenshots/screenshot_1.png" width="200" alt="Скриншот 1">
-<img src="app/src/main/res/screenshots/screenshot_2.png" width="200" alt="Скриншот 2">
-<img src="app/src/main/res/screenshots/screenshot_3.png" width="200" alt="Скриншот 3">
-<img src="app/src/main/res/screenshots/screenshot_4.png" width="200" alt="Скриншот 4">
-<img src="app/src/main/res/screenshots/screenshot_5.png" width="200" alt="Скриншот 5">
-<img src="app/src/main/res/screenshots/screenshot_6.png" width="200" alt="Скриншот 6">
-<img src="app/src/main/res/screenshots/screenshot_7.png" width="200" alt="Скриншот 7">
-<img src="app/src/main/res/screenshots/screenshot_8.png" width="200" alt="Скриншот 8">
+<img src="app/src/main/screenshots/screenshot_1.png" width="200" alt="Скриншот 1">
+<img src="app/src/main/screenshots/screenshot_2.png" width="200" alt="Скриншот 2">
+<img src="app/src/main/screenshots/screenshot_3.png" width="200" alt="Скриншот 3">
+<img src="app/src/main/screenshots/screenshot_4.png" width="200" alt="Скриншот 4">
+<img src="app/src/main/screenshots/screenshot_5.png" width="200" alt="Скриншот 5">
+<img src="app/src/main/screenshots/screenshot_6.png" width="200" alt="Скриншот 6">
+<img src="app/src/main/screenshots/screenshot_7.png" width="200" alt="Скриншот 7">
+<img src="app/src/main/screenshots/screenshot_8.png" width="200" alt="Скриншот 8">
